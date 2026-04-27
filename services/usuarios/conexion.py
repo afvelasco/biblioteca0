@@ -1,5 +1,5 @@
 from flask import Flask, jsonify,request
-from flask_restful import Api, Resource
+from flask_restful import Resource, Api
 import mysql.connector
 import hashlib
 import requests
