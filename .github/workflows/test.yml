@@ -22,7 +22,7 @@ jobs:
               - 3306:3306
             options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
             volumes:
-              - $biblioteca.sql:/docker-entrypoint-initdb.d/biblioteca.sql
+              - ${{ github.workspace }}/biblioteca.sql:/docker-entrypoint-initdb.d/biblioteca.sql        
         steps:
           - name: Checkout code
             uses: actions/checkout@v2
