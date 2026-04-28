@@ -40,10 +40,11 @@ class Test_usuarios:
         # Verificar la prueba
         assert calculado.status_code == 200
         assert esperado_entrada == calculado.json()["mensaje"]
-#        sql =f"SELECT * FROM usuarios WHERE idUsuario='{id}'"
-#        mi_cursor.execute(sql)
-#        datos = mi_cursor.fetchall()[0]
-#        assert nombre==datos[1] and contra==datos[2]
+#        if calculado.json()["mensaje"]=="Usuario agregado con éxito":
+#            sql =f"SELECT * FROM usuarios WHERE idUsuario='{nuevo_entrada["id"]}'"
+#            mi_cursor.execute(sql)
+#            datos = mi_cursor.fetchall()[0]
+#            assert datos[1]=="Usuario Pruebas"
 
     @pytest.mark.parametrize(
         ["id_entrada","contra_entrada","esperado_entrada"],
