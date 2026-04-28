@@ -41,7 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest requests
-
+          python /services/usuarios/app.py
       - name: Ejecutar pruebas con Pytest
         env:
           # Indicamos al código que la DB está en localhost para el entorno de GitHub
