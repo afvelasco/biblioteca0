@@ -1,50 +1,49 @@
-name: Pruebas Biblioteca
+name: Python Test CI
 
-on:
-    push:
-        branches:
-          - main
-    pull_request:
-        branches:
-          - main
+on: [push, pull_request]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        services:
-          mysql:
-            image: mysql:8.0
-            env:
-              MYSQL_ROOT_PASSWORD: root
-              MYSQL_DATABASE: biblioteca
-            ports:
-              - 3306:3306
-            options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-            volumes:
-              - ${{ github.workspace }}/biblioteca.sql:/docker-entrypoint-initdb.d/biblioteca.sql        
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v2
+    # Definimos el servicio de base de datos
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: biblioteca
+        ports:
+          - 3306:3306
+        # El health check es vital para que las pruebas no fallen por falta de conexión inicial
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-          - name: Instalar cliente MySQL
-            run: sudo apt-get update && sudo apt-get install -y mysql-client
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
 
-          - name: Probar conexión con MySQL
-            run: |
-              mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES"
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-          - name: Set up Python
-            uses: actions/setup-python@v2
-            with:
-                python-version: '3.13'
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests
 
-          - name: Install dependencies
-            run: |
-              python -m pip install --upgrade pip
-              pip install -r requirements.txt
-              cd services/usuarios
-
-          - name: Run test
-            run: |
-              pytest
+      - name: Ejecutar pruebas con Pytest
+        env:
+          # Indicamos al código que la DB está en localhost para el entorno de GitHub
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: biblioteca
+        run: |
+          # Ejecutamos las pruebas apuntando a tu archivo de test
+          pytest services/usuarios/test_usuarios.py
